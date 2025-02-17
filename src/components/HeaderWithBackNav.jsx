@@ -20,7 +20,7 @@ const HeaderWithBackArrow = ({ leftText }) => {
       <div
         style={{
           transition: "transform 0.3s ease",
-          transform: isHovered ? "translateX(-20px)" : "translateX(0)",
+          transform: isHovered ? "translateX(-12px)" : "translateX(0)",
         }}
       >
         <DecorativeHeader leftText={headerText} />
