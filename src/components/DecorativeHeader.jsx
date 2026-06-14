@@ -23,8 +23,10 @@ export const DecorativeHeader = ({
     left: '20px',
     top: '50%',
     transform: 'translateY(-50%)',
-    fontSize: '2.5vw',
-    fontFamily: "Urbanist",
+    fontSize: 'clamp(1.4rem, 3.5vw, 2.4rem)',
+    fontFamily: "var(--mono)",
+    fontWeight: 600,
+    letterSpacing: '0.04em',
     lineHeight: '1.2',
     textAlign: "left",
     whiteSpace: 'nowrap',
@@ -47,8 +49,8 @@ export const DecorativeHeader = ({
     left: 'calc(40% + 28px)',
     top: '50%',
     transform: 'translateY(-50%)',
-    fontSize: '2vw',
-    fontFamily: "Urbanist",
+    fontSize: '1rem',
+    fontFamily: "var(--mono)",
     textAlign: "left", // Use left alignment to match the right column content
   };
 

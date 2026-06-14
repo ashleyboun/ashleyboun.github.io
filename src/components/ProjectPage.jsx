@@ -1,81 +1,72 @@
-import React, { useState, useEffect } from "react";
-import DecorativeHeader from "./DecorativeHeader";
-import HeaderWithBackArrow from "./HeaderWithBackNav";
 import { ProjectPageLeft } from "./ProjectPgLeftCol";
-import TwoColumnLayout from "./TwoColumnLayout";
+import { Flipbook } from "./Flipbook";
+
+const pad = (n) => String(n).padStart(2, "0");
+
+// An image entry can be a plain filename ("foo.png") or an object
+// { src, caption }. Normalize to the object form so rendering is uniform.
+const normalizeImage = (img) =>
+  typeof img === "string" ? { src: img, caption: "" } : img;
 
 export const ProjectPage = ({
   title,
+  type,
+  year,
   location,
   instructor,
   course,
   date,
   teamMembers,
   description,
-  imageList,
+  imageList = [],
+  format,
+  cover,
 }) => {
-  // State to track the currently focused image
-  const [focusedImage, setFocusedImage] = useState(null);
-
-  // Optional: set a default focused image (e.g., the first in the list)
-  useEffect(() => {
-    if (imageList && imageList.length > 0) {
-      setFocusedImage(imageList[0]);
-    }
-  }, [imageList]);
-
-  // Callback to handle image clicks from the left column
-  const handleImageClick = (image) => {
-    setFocusedImage(image);
-  };
-
+  const isFlipbook = format === "flipbook";
   return (
-    <div
-      style={{
-        height: "97vh",
-        display: "flex",
-        flexDirection: "column",
-        paddingTop: 0,
-        marginTop: 0,
-      }}
-    >
-      <div style={{ marginTop: "-45px" }}>
-        <HeaderWithBackArrow leftText={title} />
+    <div className="project-detail">
+      <div className="project-topbar">
+        <a href="/#/">← home</a>
       </div>
-      <TwoColumnLayout
-        leftContent={
+
+      <div className="project-layout">
+        <aside className="project-sidebar">
+          <div className="project-title">{title}</div>
           <ProjectPageLeft
+            type={type}
+            year={year}
             instructor={instructor}
             location={location}
             course={course}
             date={date}
             teamMembers={teamMembers}
             description={description}
-            imageList={imageList}
-            onImageClick={handleImageClick} // Passing the callback here
           />
-        }
-        rightContent={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            {focusedImage ? (
-              <img
-                src={focusedImage}
-                alt="Focused"
-                style={{ maxWidth: "100%", maxHeight: "100%" }}
-              />
-            ) : (
-              <p>Select an image to view</p>
-            )}
-          </div>
-        }
-      />
+        </aside>
+
+        <div className="project-images">
+          {isFlipbook ? (
+            <Flipbook cover={cover} title={title} pages={imageList} />
+          ) : (
+            imageList.map((img, i) => {
+              const { src, caption } = normalizeImage(img);
+              return (
+                <figure key={`${src}-${i}`} className="project-plate">
+                  <div className="plate-photo">
+                    <img
+                      src={src}
+                      alt={`${title} — ${caption || `image ${i + 1}`}`}
+                    />
+                  </div>
+                  <figcaption className="plate-caption">
+                    {caption || `IMG.${pad(i + 1)}`}
+                  </figcaption>
+                </figure>
+              );
+            })
+          )}
+        </div>
+      </div>
     </div>
   );
 };

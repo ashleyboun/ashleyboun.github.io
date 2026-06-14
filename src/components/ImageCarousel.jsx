@@ -111,7 +111,7 @@ const ImageCarousel = ({ images, onImageClick }) => {
       cursor: 'pointer',
       padding: '0 10px',
       userSelect: 'none',
-      fontFamily: 'Manrope',
+      fontFamily: 'var(--mono)',
     };
 
     const imagesWrapperStyle = {

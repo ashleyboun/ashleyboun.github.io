@@ -3,7 +3,7 @@ import DecorativeHeader from "./DecorativeHeader";
 
 const HeaderWithBackArrow = ({ leftText }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const headerText = isHovered ? <a href="/">back to home</a> : leftText
+  const headerText = isHovered ? <a href="/#/">← back to home</a> : leftText
 
   return (
     <div

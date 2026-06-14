@@ -1,25 +1,41 @@
-import { DecorativeHeader } from "../components/DecorativeHeader"
-import TwoColumnLayout from "../components/TwoColumnLayout"
-import { Projects } from "../components/Projects"
-import { HomeLeftCol } from "../components/HomeLeftCol.jsx"
-import { Contact } from "../components/Contact.jsx"
+import { useState } from "react";
+import { Contact } from "../components/Contact";
+import { TagFilter } from "../components/TagFilter";
+import { ProjectGrid } from "../components/ProjectGrid";
+import { projects } from "../data/projects";
 
 export const Home = () => {
+  const [active, setActive] = useState("all");
 
+  const years = projects.map((p) => p.year);
+  const span = years.length
+    ? `${Math.min(...years)}–${Math.max(...years)}`
+    : "";
 
-    return <>
-        <div style={{ height: "97vh", display: "flex", flexDirection: "column" }}>
-            <DecorativeHeader 
-                leftText={"ashley boun"}
-                rightTopText={"contact"}
-                rightBottomText={<Contact />}
-            />
-            <TwoColumnLayout 
-                leftContent={<HomeLeftCol />}
-                rightContent={<Projects />}
-                addTopMargin={true}
-            />
+  return (
+    <>
+      <header className="site-header">
+        <div className="brand">
+          ashley boun <span className="slash">/designer</span>
         </div>
-    </>
+        <div className="meta">
+          <div>selected works [{span}]</div>
+          <div>
+            <a href="/#/experience">experience →</a>
+          </div>
+          <div>
+            <Contact />
+          </div>
+        </div>
+      </header>
 
-}
+      <p className="site-intro">
+        Architecture graduate, Iowa State University (2024). Selected studio,
+        urban, and competition work — filter the index by type below.
+      </p>
+
+      <TagFilter active={active} onChange={setActive} />
+      <ProjectGrid active={active} />
+    </>
+  );
+};
