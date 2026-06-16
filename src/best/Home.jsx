@@ -30,9 +30,13 @@ export const Home = () => {
       </header>
 
       <p className="site-intro">
-        Architecture graduate, Iowa State University (2024). Selected studio,
-        urban, and competition work — filter the index by type below.
+        {/* Architecture graduate, Iowa State University (2024). */}
+        Architecture Graduate of Iowa State University Class of 2024, 
+        currently seeking opportunities to evolve and grow as a designer.
       </p>
+      <p className="site-intro">The curated selection of projects highlights design as a
+        versatile tool applied across a variety of contexts, ranging
+        from complete, real-world projects to conceptual and exploratory designs.</p>
 
       <TagFilter active={active} onChange={setActive} />
       <ProjectGrid active={active} />

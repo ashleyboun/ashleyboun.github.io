@@ -1,8 +1,6 @@
 import { getProjectsByType } from "../data/projects";
 
-const pad = (n) => String(n).padStart(2, "0");
-
-// Data-driven, responsive grid of blueprint project cards.
+// Data-driven, masonry-style grid of project cards.
 export const ProjectGrid = ({ active = "all" }) => {
   const shown = getProjectsByType(active);
 
@@ -12,10 +10,9 @@ export const ProjectGrid = ({ active = "all" }) => {
 
   return (
     <div className="project-grid">
-      {shown.map((p, i) => (
+      {shown.map((p) => (
         <a key={p.id} className="project-card" href={`/#/project/${p.id}`}>
           <div className="frame">
-            <span className="index-tick">PROJ.{pad(i + 1)}</span>
             <img src={p.cover} alt={p.title} />
           </div>
           <div className="body">

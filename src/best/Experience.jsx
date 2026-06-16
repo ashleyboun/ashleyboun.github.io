@@ -20,11 +20,14 @@ export const Experience = () => {
       </header>
 
       <p className="site-intro">
-        Experience beyond the portfolio — work, leadership, and the tools I build with.
+        An architecture graduate with a construction foundation in detailing,
+        estimating, and documentation — bringing an eye for design and an
+        understanding of how it meets the ground.
       </p>
 
       <ExperienceSection title="work" kind="work" />
       <ExperienceSection title="leadership" kind="leadership" />
+      <ExperienceSection title="honors" kind="honors" />
       <SkillsBlock />
     </>
   );

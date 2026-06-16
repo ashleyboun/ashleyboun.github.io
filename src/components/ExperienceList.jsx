@@ -1,8 +1,9 @@
 import { getExperiences } from "../data/experiences";
 
-// Format a year range: single year if start == end (or no start), else "2021–2023".
+// Format a year range: "present" for ongoing roles, single year if
+// start == end (or no start), else "2021–2023".
 const yearLabel = (e) => {
-  const end = e.end ?? e.year;
+  const end = e.current ? "present" : e.end ?? e.year;
   const start = e.start ?? e.year;
   if (!end) return "";
   return start && start !== end ? `${start}–${end}` : `${end}`;
