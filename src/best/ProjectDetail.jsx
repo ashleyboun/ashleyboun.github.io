@@ -27,6 +27,8 @@ export const ProjectDetail = () => {
       teamMembers={project.team}
       description={project.description}
       imageList={project.images}
+      flipbookPages={project.flipbook}
+      pdf={project.pdf}
       format={project.format}
       cover={project.cover}
     />

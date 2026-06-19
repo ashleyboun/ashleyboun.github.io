@@ -8,6 +8,27 @@ const pad = (n) => String(n).padStart(2, "0");
 const normalizeImage = (img) =>
   typeof img === "string" ? { src: img, caption: "" } : img;
 
+// Polaroid-style photocards for each image, captioned beneath.
+const ImagePlates = ({ title, imageList }) =>
+  imageList.map((img, i) => {
+    const { src, caption } = normalizeImage(img);
+    return (
+      <figure key={`${src}-${i}`} className="project-plate">
+        <div className="plate-photo">
+          <img
+            src={src}
+            alt={`${title} — ${caption || `image ${i + 1}`}`}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <figcaption className="plate-caption">
+          {caption || `IMG.${pad(i + 1)}`}
+        </figcaption>
+      </figure>
+    );
+  });
+
 export const ProjectPage = ({
   title,
   type,
@@ -19,10 +40,13 @@ export const ProjectPage = ({
   teamMembers,
   description,
   imageList = [],
+  flipbookPages = [],
+  pdf,
   format,
   cover,
 }) => {
   const isFlipbook = format === "flipbook";
+  const pages = flipbookPages.length ? flipbookPages : imageList;
   return (
     <div className="project-detail">
       <div className="project-topbar">
@@ -45,26 +69,10 @@ export const ProjectPage = ({
         </aside>
 
         <div className="project-images">
-          {isFlipbook ? (
-            <Flipbook cover={cover} title={title} pages={imageList} />
-          ) : (
-            imageList.map((img, i) => {
-              const { src, caption } = normalizeImage(img);
-              return (
-                <figure key={`${src}-${i}`} className="project-plate">
-                  <div className="plate-photo">
-                    <img
-                      src={src}
-                      alt={`${title} — ${caption || `image ${i + 1}`}`}
-                    />
-                  </div>
-                  <figcaption className="plate-caption">
-                    {caption || `IMG.${pad(i + 1)}`}
-                  </figcaption>
-                </figure>
-              );
-            })
+          {isFlipbook && (
+            <Flipbook cover={cover} title={title} pages={pages} pdf={pdf} />
           )}
+          <ImagePlates title={title} imageList={imageList} />
         </div>
       </div>
     </div>

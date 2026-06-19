@@ -95,20 +95,27 @@
 
 /* ── Project grid ────────────────────────────────── */
 
-/* Masonry-style columns: cards keep their natural image height and flow
-   into balanced columns for a looser, more artistic layout. */
+/* Masonry-style columns built from explicit buckets (see ProjectGrid),
+   so cards keep their natural height and projects can be pinned to a
+   column via their `column` field. */
 .project-grid {
-  column-count: 3;
-  column-gap: 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
   margin-top: 28px;
+}
+
+.grid-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 
 .project-card {
   display: block;
   color: inherit;
-  margin-bottom: 28px;
-  break-inside: avoid;
-  -webkit-column-break-inside: avoid;
   background: var(--card-bg);
   border: 1px solid var(--rule);
   box-shadow: 0 2px 8px rgba(8, 7, 8, 0.08);
@@ -141,6 +148,37 @@
 
 .project-card .body {
   padding: 12px 14px 16px;
+}
+
+/* Placeholder card (e.g. fabrication — work to come). */
+.project-card.is-placeholder {
+  cursor: default;
+}
+
+.project-card.is-placeholder:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(8, 7, 8, 0.08);
+}
+
+.frame-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--frame-bg),
+    var(--frame-bg) 10px,
+    rgba(8, 7, 8, 0.03) 10px,
+    rgba(8, 7, 8, 0.03) 20px
+  );
+}
+
+.frame-empty span {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .project-card .title {
@@ -296,20 +334,42 @@
   max-height: calc(100vh - 200px);
 }
 
-.flipbook-open {
+.flipbook-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.flipbook-open,
+.flipbook-pdf {
   font-family: var(--mono);
   font-size: 0.82rem;
   letter-spacing: 0.04em;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.flipbook-open {
   color: var(--paper);
   background: var(--accent);
   border: 1px solid var(--accent);
-  padding: 9px 18px;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
 }
 
 .flipbook-open:hover {
   opacity: 0.85;
+}
+
+/* Secondary: outline style to distinguish from the filled flipbook button. */
+.flipbook-pdf {
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--accent);
+}
+
+.flipbook-pdf:hover {
+  color: var(--paper);
+  background: var(--accent);
 }
 
 /* Modal */
@@ -364,30 +424,51 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   perspective: 1600px;
 }
 
-.flipbook-stage img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+/* The frame is sized by the blurred low-res placeholder; the full page is
+   layered on top and fades in once loaded. Re-keyed per page so the flip
+   animation replays. Pivots from center with a gentle angle so the page
+   never exceeds the stage (no clipping at the edges). */
+.flipbook-frame {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  max-width: 100%;
+  transform-origin: center;
+  animation: page-turn 0.4s ease;
 }
 
-/* Page-turn animation, replayed on each page change via the React key. */
+.flipbook-lqip {
+  display: block;
+  width: auto;
+  height: auto;
+  /* Hard ceiling (leaves room for controls + overlay padding) so portrait
+     pages can't overflow the viewport and bury the prev/next controls. */
+  max-width: 100%;
+  max-height: 80vh;
+  filter: blur(12px);
+}
+
 .flipbook-page {
-  transform-origin: left center;
-  animation: page-turn 0.4s ease;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.flipbook-page.is-loaded {
+  opacity: 1;
 }
 
 @keyframes page-turn {
   from {
-    opacity: 0.2;
-    transform: rotateY(-22deg);
+    transform: rotateY(-10deg);
   }
   to {
-    opacity: 1;
     transform: rotateY(0);
   }
 }
@@ -541,9 +622,6 @@
 /* ── Responsive ──────────────────────────────────── */
 
 @media (max-width: 900px) {
-  .project-grid {
-    column-count: 2;
-  }
   .project-layout {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -558,9 +636,6 @@
 @media (max-width: 600px) {
   #root {
     padding: 0 16px 48px;
-  }
-  .project-grid {
-    column-count: 1;
   }
   .site-header {
     align-items: flex-start;

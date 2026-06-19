@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
+import lqip from "../data/lqip";
 
 const srcOf = (img) => (typeof img === "string" ? img : img.src);
 const captionOf = (img) => (typeof img === "string" ? "" : img.caption || "");
 
 // Flipbook format: a single cover image (no caption) plus a button that
 // opens a modal flipping through the project's pages.
-export const Flipbook = ({ cover, title, pages = [] }) => {
+export const Flipbook = ({ cover, title, pages = [], pdf }) => {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
+  const [loadedPage, setLoadedPage] = useState(-1);
 
   const last = pages.length - 1;
   const go = (n) => setPage((p) => Math.min(Math.max(p + n, 0), last));
@@ -40,20 +42,34 @@ export const Flipbook = ({ cover, title, pages = [] }) => {
   };
 
   const current = pages[page];
+  // The on-page cover is the first page of the flipbook itself.
+  const coverSrc = pages.length ? srcOf(pages[0]) : cover;
 
   return (
     <div className="flipbook-block">
       <figure className="flipbook-cover">
         <div className="plate-photo">
-          <img src={cover} alt={title} />
+          <img src={coverSrc} alt={title} loading="lazy" decoding="async" />
         </div>
       </figure>
 
-      {pages.length > 0 && (
-        <button className="flipbook-open" onClick={openBook}>
-          open flipbook ({pages.length}) →
-        </button>
-      )}
+      <div className="flipbook-actions">
+        {pages.length > 0 && (
+          <button className="flipbook-open" onClick={openBook}>
+            open flipbook ({pages.length}) →
+          </button>
+        )}
+        {pdf && (
+          <a
+            className="flipbook-pdf"
+            href={pdf}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open as PDF ↗
+          </a>
+        )}
+      </div>
 
       {open && (
         <div
@@ -73,12 +89,25 @@ export const Flipbook = ({ cover, title, pages = [] }) => {
 
           <div className="flipbook-modal" onClick={(e) => e.stopPropagation()}>
             <div className="flipbook-stage">
-              <img
-                key={page}
-                className="flipbook-page"
-                src={srcOf(current)}
-                alt={`${title} — page ${page + 1}`}
-              />
+              {/* Blurred low-res placeholder sets the box size; the full
+                  page fades in on top once it loads. */}
+              <div key={page} className="flipbook-frame">
+                <img
+                  className="flipbook-lqip"
+                  src={lqip[srcOf(current)] || srcOf(current)}
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className={`flipbook-page${
+                    loadedPage === page ? " is-loaded" : ""
+                  }`}
+                  src={srcOf(current)}
+                  alt={`${title} — page ${page + 1}`}
+                  decoding="async"
+                  onLoad={() => setLoadedPage(page)}
+                />
+              </div>
             </div>
 
             <div className="flipbook-controls">
