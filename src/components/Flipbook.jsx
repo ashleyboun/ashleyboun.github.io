@@ -42,6 +42,7 @@ export const Flipbook = ({ cover, title, pages = [], pdf }) => {
   };
 
   const current = pages[page];
+  const ph = current ? lqip[srcOf(current)] : null; // { ar, uri } placeholder
   // The on-page cover is the first page of the flipbook itself.
   const coverSrc = pages.length ? srcOf(pages[0]) : cover;
 
@@ -89,15 +90,22 @@ export const Flipbook = ({ cover, title, pages = [], pdf }) => {
 
           <div className="flipbook-modal" onClick={(e) => e.stopPropagation()}>
             <div className="flipbook-stage">
-              {/* Blurred low-res placeholder sets the box size; the full
-                  page fades in on top once it loads. */}
-              <div key={page} className="flipbook-frame">
-                <img
-                  className="flipbook-lqip"
-                  src={lqip[srcOf(current)] || srcOf(current)}
-                  alt=""
-                  aria-hidden="true"
-                />
+              {/* The frame is sized by the page's aspect ratio so it fills
+                  the stage correctly before the full image loads; the
+                  blurred placeholder shows underneath, full page fades in. */}
+              <div
+                key={page}
+                className="flipbook-frame"
+                style={{ "--ar": ph?.ar || 1 }}
+              >
+                {ph?.uri && (
+                  <img
+                    className="flipbook-lqip"
+                    src={ph.uri}
+                    alt=""
+                    aria-hidden="true"
+                  />
+                )}
                 <img
                   className={`flipbook-page${
                     loadedPage === page ? " is-loaded" : ""

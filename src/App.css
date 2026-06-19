@@ -427,35 +427,33 @@
   perspective: 1600px;
 }
 
-/* The frame is sized by the blurred low-res placeholder; the full page is
-   layered on top and fades in once loaded. Re-keyed per page so the flip
-   animation replays. Pivots from center with a gentle angle so the page
-   never exceeds the stage (no clipping at the edges). */
+/* The frame is sized by the page's aspect ratio (--ar), as large as the
+   stage allows (height capped at 80vh to leave room for the controls), so
+   it's correct before the full image loads. The blurred placeholder fills
+   it underneath and the full page fades in on top. Re-keyed per page so the
+   flip animation replays; pivots from center so it never clips the edges. */
 .flipbook-frame {
   position: relative;
-  display: inline-block;
-  line-height: 0;
-  max-width: 100%;
+  width: min(100%, calc(80vh * var(--ar, 1)));
+  aspect-ratio: var(--ar, 1);
   transform-origin: center;
   animation: page-turn 0.4s ease;
 }
 
-.flipbook-lqip {
-  display: block;
-  width: auto;
-  height: auto;
-  /* Hard ceiling (leaves room for controls + overlay padding) so portrait
-     pages can't overflow the viewport and bury the prev/next controls. */
-  max-width: 100%;
-  max-height: 80vh;
-  filter: blur(12px);
-}
-
+.flipbook-lqip,
 .flipbook-page {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: contain;
+}
+
+.flipbook-lqip {
+  filter: blur(4px);
+}
+
+.flipbook-page {
   opacity: 0;
   transition: opacity 0.4s ease;
 }
