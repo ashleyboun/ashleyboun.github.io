@@ -34,32 +34,29 @@ const ProjectCard = ({ p }) =>
     </a>
   );
 
-// Distribute projects into `cols` column buckets. When there are 3 columns,
-// a project's optional `column` field (1-3) pins it to that column; anything
-// unassigned drops into the currently-shortest column (by card count). The
-// optional `row` field then orders cards within their column (lower = higher
-// up; unassigned cards keep their default order below the pinned ones). With
-// fewer columns (tablet/mobile) both fields are ignored and projects fill in
-// order so reading order stays sensible.
-const bucketize = (projects, cols) => {
+// Distribute projects into `cols` column buckets.
+//
+// When `respectPlacement` (the unfiltered, 3-column view), a project's
+// optional `column` field (1-3) pins it to that column and `row` orders cards
+// within the column. Otherwise — a filter is active, or there are fewer
+// columns (tablet/mobile) — placement is ignored and projects pack into the
+// currently-shortest column in order, so the filtered set lays out properly
+// instead of keeping gaps from its full-grid positions.
+const bucketize = (projects, cols, respectPlacement) => {
   const buckets = Array.from({ length: cols }, () => []);
-  if (cols >= 3) {
+  const shortest = () =>
+    buckets.reduce((min, b, i) => (b.length < buckets[min].length ? i : min), 0);
+
+  if (respectPlacement && cols >= 3) {
     projects.forEach((p) => {
       const pinned = p.column >= 1 && p.column <= cols ? p.column - 1 : null;
-      const target =
-        pinned ??
-        buckets.reduce(
-          (min, b, i) => (b.length < buckets[min].length ? i : min),
-          0
-        );
-      buckets[target].push(p);
+      buckets[pinned ?? shortest()].push(p);
     });
-    // Stable sort each column by `row` (unassigned sink to the bottom).
     buckets.forEach((b) =>
       b.sort((a, c) => (a.row ?? Infinity) - (c.row ?? Infinity))
     );
   } else {
-    projects.forEach((p, i) => buckets[i % cols].push(p));
+    projects.forEach((p) => buckets[shortest()].push(p));
   }
   return buckets;
 };
@@ -81,7 +78,7 @@ export const ProjectGrid = ({ active = "all" }) => {
     return <p className="empty-state">no projects tagged #{active}.</p>;
   }
 
-  const buckets = bucketize(shown, cols);
+  const buckets = bucketize(shown, cols, active === "all");
 
   return (
     <div className="project-grid">
